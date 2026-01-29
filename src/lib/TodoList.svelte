@@ -23,10 +23,12 @@
 		} satisfies Todo);
 
 		newTodo = '';
+		lists.save(); // Save after adding todo
 	}
 
 	function removeTodo(id: string): void {
 		list.todos = list.todos.filter(t => t.id !== id);
+		lists.save(); // Save after removing todo
 	}
 </script>
 

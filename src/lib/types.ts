@@ -1,6 +1,5 @@
-import type { IconName } from "$lib/icon_generator/icons";
-import type { Icon } from "lucide-svelte";
-import type { ComponentType } from "svelte";
+import type { ComponentType } from 'svelte';
+import type { Icon } from 'lucide-svelte';
 
 export type Todo = {
 	id: string;
@@ -10,9 +9,10 @@ export type Todo = {
 
 export type TodoList = {
 	id: string;
-	theme: string;
 	name: string;
 	description: string;
 	todos: Todo[];
-    icon: ComponentType<Icon>;
+	theme: string;
+	icon: ComponentType<Icon>;
+	iconName?: string; // Optional, used for serialization
 };
