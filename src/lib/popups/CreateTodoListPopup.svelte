@@ -46,7 +46,9 @@
 
 <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
 	<div class="bg-white rounded-xl p-6 w-100 relative">
-		<button class="cursor-pointer absolute top-5 right-5 text-gray-500" onclick={onClose}> ✕ </button>
+		<button class="cursor-pointer absolute top-5 right-5 text-gray-500" onclick={onClose}>
+			✕
+		</button>
 
 		<h2 class="text-xl font-semibold mb-2">Create New List</h2>
 
@@ -106,7 +108,9 @@
 			</div>
 
 			<div class={'flex justify-end gap-2 mt-2'}>
-				<button type="submit" class="px-3 py-3 bg-blue-500 text-white rounded w-full cursor-pointer">Create List</button>
+				<button type="submit" class="px-3 py-3 bg-blue-500 text-white rounded w-full cursor-pointer"
+					>Create List</button
+				>
 			</div>
 		</form>
 	</div>

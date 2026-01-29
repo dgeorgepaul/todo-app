@@ -98,7 +98,6 @@ class ListsState {
 		return this.#lists.map(fn);
 	}
 
-	// Trigger save for any mutation
 	save() {
 		saveToStorage(this.#lists);
 	}

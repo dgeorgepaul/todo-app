@@ -1,15 +1,18 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { fade } from 'svelte/transition';
 	import TodoItem from './TodoItem.svelte';
 	import { lists } from './todolists.svelte';
 	import type { TodoList, Todo } from './types';
     import { ArrowLeft } from 'lucide-svelte';
     import { v4 as uuidv4 } from 'uuid';
+	import { flip } from 'svelte/animate';
+	import { cubicOut } from 'svelte/easing';
 
 	let { list }: { list: TodoList } = $props();
 
 	let newTodo = $state<string>('');
-
+    let all_todos_completed = $state(true);
 	const remaining = $derived<number>(
 		list.todos.filter(t => !t.done).length
 	);
@@ -31,7 +34,14 @@
 		list.todos = list.todos.filter(t => t.id !== id);
 		lists.save(); // Save after removing todo
 	}
-
+    function completedTodos(): void {
+        // This function can be used to perform actions when all todos are completed
+        console.log('All todos completed!');
+        all_todos_completed = true;
+    }   
+    function movedATodo(): void {
+        all_todos_completed = false;
+    }
 
 </script>
 
@@ -66,39 +76,55 @@
         <!-- Active todos -->
         <div>
             <h2 class="text-lg font-semibold mb-3 text-gray-500">TO DO</h2>
-            <ul class="space-y-2 bg-white p-4 rounded-lg border border-gray-200 flex flex-col gap-2">
-                {#each list.todos.filter(t => !t.done) as todo (todo.id)}
+            <ul class="space-y-2 bg-white py-2 px-4 rounded-lg border border-gray-200 flex flex-col gap-2">
+                {#each list.todos.filter(t => !t.done) as todo, index (todo.id)}
+                <div class="{index < list.todos.filter(t => !t.done).length - 1 ? 'border-b-2 border-b-stone-200 pb-0 m-0' : ''}"
+                	animate:flip={{ duration: 250, easing: cubicOut }}>
                     <TodoItem
                         {todo}
+                        {list}
                         onToggle={() => (todo.done = !todo.done)}
                         onDelete={removeTodo}
+                        completedAllTodos={completedTodos}
+                        movedATodo={movedATodo}
+
                     />
+                </div>
                 {/each}
-                {#if list.todos.filter(t => !t.done).length === 0 && list.todos.length > 0}
-                    <p class="text-gray-400 text-sm">All todos completed!</p>
+                {#if list.todos.filter(t => !t.done).length === 0 && list.todos.length > 0 && all_todos_completed}
+                    <p in:fade={{ duration: 200 }} class="text-gray-400 text-sm">All todos completed!</p>
                 {/if}
                 {#if list.todos.length === 0}
-                    <p>No todos yet 👀</p>
+                    <p class="text-gray-400 text-sm">No todos yet 👀</p>
                 {/if}
             </ul>
 
         </div>
 
         <!-- Completed todos -->
-        {#if list.todos.filter(t => t.done).length > 0}
             <div>
                 <h2 class="text-lg font-semibold mb-3 text-gray-500">Completed ({list.todos.filter(t => t.done).length})</h2>
-                <ul class="space-y-2 bg-white p-4 rounded-lg border border-gray-200 flex flex-col gap-2">
-                    {#each list.todos.filter(t => t.done) as todo (todo.id)}
+                <ul class="space-y-2 bg-white py-2 px-4 rounded-lg border border-gray-200 flex flex-col gap-2">
+                    {#each list.todos.filter(t => t.done) as todo, index (todo.id)}
+                    <div animate:flip={{ duration: 250, easing: cubicOut }} class="{index < list.todos.filter(t => t.done).length - 1 ? 'border-b-2 border-b-stone-200' : ''}">
                         <TodoItem
                             {todo}
+                            {list}
                             onToggle={() => (todo.done = !todo.done)}
                             onDelete={removeTodo}
+                            completedAllTodos={completedTodos}
+                            movedATodo={movedATodo}
                         />
+                    </div>
                     {/each}
+                    {#if list.todos.filter(t => t.done).length === 0 && list.todos.length > 0 && all_todos_completed}
+                        <p in:fade={{ duration: 200 }} class="text-gray-400 text-sm">Better Get To Work!</p>
+                    {/if}
+                    {#if list.todos.length === 0}
+                        <p class="text-gray-400 text-sm">No todos yet 👀</p>
+                    {/if}
                 </ul>
             </div>
-        {/if}
 
 
     </div>
