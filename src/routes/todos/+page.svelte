@@ -7,6 +7,7 @@
 	import { ChevronRight, Plus } from 'lucide-svelte';
 	import CreateTodoListPopup from '$lib/popups/CreateTodoListPopup.svelte';
 	import type { ICONS } from '$lib/icon_generator/icons';
+	import { v4 as uuidv4 } from 'uuid';
 
 	let newListName = $state<string>('');
 	let showPopup = $state(false);
@@ -25,7 +26,7 @@
 		if (!newListName.trim()) return;
 
 		lists.push({
-			id: crypto.randomUUID(),
+			id: uuidv4(),
 			name: newListName,
 			description: '',
 			todos: [],
@@ -49,6 +50,9 @@
 		return { done, total };
 	}
 	let completed = $derived(lists.filter((list) => list.todos.every((todo) => todo.done)).length);
+
+
+
 </script>
 
 <div class="flex flex-col w-full">

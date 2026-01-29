@@ -4,6 +4,7 @@
 	import { lists } from './todolists.svelte';
 	import type { TodoList, Todo } from './types';
     import { ArrowLeft } from 'lucide-svelte';
+    import { v4 as uuidv4 } from 'uuid';
 
 	let { list }: { list: TodoList } = $props();
 
@@ -17,7 +18,7 @@
 		if (!newTodo.trim()) return;
 
 		list.todos.push({
-			id: crypto.randomUUID(),
+			id: uuidv4(),
 			text: newTodo,
 			done: false
 		} satisfies Todo);
@@ -30,6 +31,8 @@
 		list.todos = list.todos.filter(t => t.id !== id);
 		lists.save(); // Save after removing todo
 	}
+
+
 </script>
 
 
