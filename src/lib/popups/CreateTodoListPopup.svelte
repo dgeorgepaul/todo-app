@@ -4,7 +4,7 @@
 	import { ICONS } from '$lib/icon_generator/icons';
 	import type { ComponentType } from 'svelte';
 	import type { Icon } from 'lucide-svelte';
-
+	import { v4 as uuidv4 } from 'uuid';
 	type IconName = keyof typeof ICONS;
 
 	let { onClose, onCreate }: { onClose: () => void; onCreate: (list: TodoList) => void } = $props();
@@ -30,7 +30,7 @@
 		if (!name.trim()) return;
 
 		const newList: TodoList = {
-			id: crypto.randomUUID(),
+			id: uuidv4(),
 			name: name.trim(),
 			todos: [],
 			description: description.trim(),
