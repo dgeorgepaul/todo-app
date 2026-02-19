@@ -1,13 +1,15 @@
 <script lang="ts">
-	import { getRandomIcon } from '$lib/icon_generator/random_icon';
+	import { getRandomIcon, getRandomIconName } from '$lib/icon_generator/random_icon';
 	import type { TodoList } from '$lib/types';
 	import { ICONS } from '$lib/icon_generator/icons';
-	import type { ComponentType } from 'svelte';
-	import type { Icon } from 'lucide-svelte';
-	import { v4 as uuidv4 } from 'uuid';
+	import type { IconName } from '$lib/icon_generator/icons';
+	import { lists } from '$lib/todolists.svelte';
+	import { ApiError } from '$lib/api';
+
 	type IconName = keyof typeof ICONS;
 
 	let { onClose, onCreate }: { onClose: () => void; onCreate: (list: TodoList) => void } = $props();
+
 	const themes = [
 		{ name: 'sky', class: 'bg-sky-400', hex: '#38BDF8' },
 		{ name: 'indigo', class: 'bg-indigo-500', hex: '#6366F1' },
@@ -20,27 +22,44 @@
 		{ name: 'slate', class: 'bg-slate-500', hex: '#64748B' },
 		{ name: 'charcoal', class: 'bg-slate-700', hex: '#334155' }
 	];
+
 	let name: string = $state<string>('');
 	let description: string = $state<string>('');
+	let theme: string = $state<string>('#38BDF8');
+	let selectedIconName = $state<IconName>(getRandomIconName());
+	let selectedIcon = $derived(ICONS[selectedIconName]);
+	let submitting = $state(false);
+	let error = $state('');
 
-	let theme: string = $state<string>('bg-sky-400');
-	let selectedIcon = $state<ComponentType<Icon>>(getRandomIcon());
-	function submit(e: Event) {
+	async function submit(e: Event) {
 		e.preventDefault();
-		if (!name.trim()) return;
+		if (!name.trim() || submitting) return;
 
-		const newList: TodoList = {
-			id: uuidv4(),
-			name: name.trim(),
-			todos: [],
-			description: description.trim(),
-			theme,
-			icon: selectedIcon
-		} as TodoList;
+		submitting = true;
+		error = '';
 
-		onCreate(newList);
-		name = '';
-		onClose();
+		try {
+			const created = await lists.createList({
+				name: name.trim(),
+				theme,
+				icon: selectedIconName,
+				description: description.trim() || null
+			});
+
+			if (created) {
+				onCreate(created);
+			}
+			name = '';
+			onClose();
+		} catch (err) {
+			if (err instanceof ApiError) {
+				error = err.message;
+			} else {
+				error = 'Failed to create list. Please try again.';
+			}
+		} finally {
+			submitting = false;
+		}
 	}
 </script>
 
@@ -51,6 +70,12 @@
 		</button>
 
 		<h2 class="text-xl font-semibold mb-2">Create New List</h2>
+
+		{#if error}
+			<div class="mb-3 p-2 rounded-lg bg-red-50 border border-red-200 text-red-600 text-sm">
+				{error}
+			</div>
+		{/if}
 
 		<form onsubmit={submit} class="flex flex-col gap-3">
 			<!-- svelte-ignore a11y_label_has_associated_control -->
@@ -86,12 +111,11 @@
 			<label class="text-sm">Icon</label>
 			<div class="flex gap-3 w-full flex-wrap" style="color: {theme}">
 				{#each Object.keys(ICONS) as icon}
-					<!-- <div>this test</div> -->
 					<div
 						class={`
         w-6 h-6 {theme} flex items-center justify-center rounded-md cursor-pointer transition
         ${
-					selectedIcon === ICONS[icon as IconName]
+					selectedIconName === (icon as IconName)
 						? 'ring-2 ring-offset-2 ring-black scale-110'
 						: 'hover:scale-105'
 				}
@@ -99,7 +123,7 @@
 					>
 						<svelte:component
 							this={ICONS[icon as IconName]}
-							onclick={() => (selectedIcon = ICONS[icon as IconName])}
+							onclick={() => (selectedIconName = icon as IconName)}
 							class="h-5 w-5"
 							style="width: 20px; cursor: pointer; color: {theme}"
 						/>
@@ -108,9 +132,13 @@
 			</div>
 
 			<div class={'flex justify-end gap-2 mt-2'}>
-				<button type="submit" class="px-3 py-3 bg-blue-500 text-white rounded w-full cursor-pointer"
-					>Create List</button
+				<button
+					type="submit"
+					disabled={submitting}
+					class="px-3 py-3 bg-blue-500 text-white rounded w-full cursor-pointer disabled:opacity-50"
 				>
+					{submitting ? 'Creating...' : 'Create List'}
+				</button>
 			</div>
 		</form>
 	</div>

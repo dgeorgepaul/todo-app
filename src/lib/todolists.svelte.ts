@@ -1,83 +1,119 @@
-import type { TodoList } from './types';
+import type { TodoList, TodoListResponse } from './types';
 import { getRandomIcon } from '$lib/icon_generator/random_icon';
-import { v4 as uuidv4 } from 'uuid';
-import { browser } from '$app/environment';
 import { ICONS } from '$lib/icon_generator/icons';
+import {
+	fetchLists,
+	fetchListById,
+	createList as createListApi,
+	updateList as updateListApi,
+	deleteList as deleteListApi,
+	ApiError
+} from './api';
+import type { CreateListRequest, UpdateListRequest } from './types';
 
-const STORAGE_KEY = 'todo-lists';
-
-// Load from localStorage
-function loadFromStorage(): TodoList[] {
-	if (!browser) return [];
-	
-	try {
-		const stored = localStorage.getItem(STORAGE_KEY);
-		if (!stored) return [];
-		
-		const parsed = JSON.parse(stored);
-		
-		// Restore icon components from icon names
-		return parsed.map((list: any) => ({
-			...list,
-			icon: ICONS[list.iconName as keyof typeof ICONS] || getRandomIcon()
-		}));
-	} catch (error) {
-		console.error('Failed to load from localStorage:', error);
-		return [];
-	}
+function enrichWithIcon(list: TodoListResponse): TodoList {
+	const iconKey = list.icon || list.theme;
+	return {
+		...list,
+		todos: list.todos ?? [],
+		icon:
+			iconKey && ICONS[iconKey as keyof typeof ICONS]
+				? ICONS[iconKey as keyof typeof ICONS]
+				: getRandomIcon()
+	};
 }
 
-// Save to localStorage
-export function saveToStorage(lists: TodoList[]): void {
-	if (!browser) return;
-	
-	try {
-		// Convert icon components to icon names for storage
-		const toStore = lists.map((list) => {
-			const iconName = Object.keys(ICONS).find(
-				key => ICONS[key as keyof typeof ICONS] === list.icon
-			);
-			return {
-				...list,
-				iconName
-			};
-		});
-		
-		localStorage.setItem(STORAGE_KEY, JSON.stringify(toStore));
-	} catch (error) {
-		console.error('Failed to save to localStorage:', error);
-	}
-}
-
-// Initialize with stored data or default data
-const initialLists: TodoList[] = loadFromStorage();
-if (initialLists.length === 0) {
-	initialLists.push({
-		id: uuidv4(),
-		name: 'Personal',
-		icon: getRandomIcon(),
-		theme: 'blue',
-		description: 'Personal tasks and reminders',
-		todos: [
-			{ id: uuidv4(), text: 'Buy milk', done: false }
-		]
-	});
-}
-
-// Create a reactive state array
 class ListsState {
-	#lists = $state<TodoList[]>(initialLists);
+	#lists = $state<TodoList[]>([]);
+	#loading = $state(false);
+	#error = $state<string | null>(null);
 
 	get value() {
 		return this.#lists;
 	}
 
-	push(item: TodoList) {
-		this.#lists.push(item);
-		saveToStorage(this.#lists);
+	get loading() {
+		return this.#loading;
 	}
 
-	// Enable array access and iteration
+	get error() {
+		return this.#error;
+	}
+
+	async load() {
+		this.#loading = true;
+		this.#error = null;
+		try {
+			const fetched = await fetchLists();
+			this.#lists = fetched.map(enrichWithIcon);
+		} catch (error) {
+			console.error('Failed to load lists:', error);
+			if (error instanceof ApiError) {
+				this.#error = error.message;
+			}
+		} finally {
+			this.#loading = false;
+		}
+	}
+
+	async loadDetails(id: string): Promise<TodoList | undefined> {
+		try {
+			const list = await fetchListById(id);
+			const listWithIcon = enrichWithIcon(list);
+			const index = this.#lists.findIndex((l) => l.id === id);
+			if (index !== -1) {
+				this.#lists[index] = listWithIcon;
+			} else {
+				this.#lists.push(listWithIcon);
+			}
+			return listWithIcon;
+		} catch (error) {
+			console.error(`Failed to load list details for ${id}:`, error);
+			if (error instanceof ApiError) {
+				throw error; // Re-throw so caller can handle 403/404
+			}
+			return undefined;
+		}
+	}
+
+	async createList(data: CreateListRequest): Promise<TodoList | undefined> {
+		try {
+			const created = await createListApi(data);
+			const listWithIcon = enrichWithIcon(created);
+			this.#lists.push(listWithIcon);
+			return listWithIcon;
+		} catch (error) {
+			console.error('Failed to create list:', error);
+			throw error;
+		}
+	}
+
+	async updateList(id: string, data: UpdateListRequest): Promise<TodoList | undefined> {
+		try {
+			const updated = await updateListApi(id, data);
+			const listWithIcon = enrichWithIcon(updated);
+			const index = this.#lists.findIndex((l) => l.id === id);
+			if (index !== -1) {
+				this.#lists[index] = listWithIcon;
+			}
+			return listWithIcon;
+		} catch (error) {
+			console.error('Failed to update list:', error);
+			throw error;
+		}
+	}
+
+	async deleteList(id: string): Promise<void> {
+		try {
+			await deleteListApi(id);
+			this.#lists = this.#lists.filter((l) => l.id !== id);
+		} catch (error) {
+			console.error('Failed to delete list:', error);
+			throw error;
+		}
+	}
+
+	// Keep convenience methods for reactive templates
 	[Symbol.iterator]() {
 		return this.#lists[Symbol.iterator]();
 	}
@@ -96,10 +132,6 @@ class ListsState {
 
 	map<T>(fn: (list: TodoList, index: number) => T) {
 		return this.#lists.map(fn);
-	}
-
-	save() {
-		saveToStorage(this.#lists);
 	}
 }
 
