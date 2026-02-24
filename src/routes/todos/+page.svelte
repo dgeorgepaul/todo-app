@@ -37,17 +37,28 @@
 </script>
 
 <div class="flex flex-col w-full">
-	<nav class="border-b-stone-200 border-b-1 bg-[#fcfaf8cc]">
+	<nav
+		style="border-bottom: 1px solid var(--todo-header-border); background-color: var(--todo-nav-bg);"
+	>
 		<div class="container mx-auto py-4 px-2 w-[50rem] flex items-center justify-between">
 			<div>
-				<h1 class="font-semibold text-[#2c2421] text-lg">My Lists</h1>
-				<p class="font-light text-[#8c7b73] text-base">
+				<h1 class="font-semibold text-lg" style="color: var(--todo-text-primary);">My Lists</h1>
+				<p class="font-light text-base" style="color: var(--todo-text-secondary);">
 					{completed} of {lists.length} lists completed
 				</p>
 			</div>
 			<button
 				onclick={() => (showGroupPopup = true)}
-				class="flex items-center gap-2 text-sm text-[#8c7b73] hover:text-[#e76e50] cursor-pointer transition-colors px-3 py-2 rounded-lg hover:bg-stone-100"
+				class="flex items-center gap-2 text-sm cursor-pointer transition-colors px-3 py-2 rounded-lg"
+				style="color: var(--todo-text-secondary);"
+				onmouseenter={(e) => {
+					e.currentTarget.style.color = 'var(--todo-link-color)';
+					e.currentTarget.style.backgroundColor = 'var(--todo-hover-bg)';
+				}}
+				onmouseleave={(e) => {
+					e.currentTarget.style.color = 'var(--todo-text-secondary)';
+					e.currentTarget.style.backgroundColor = 'transparent';
+				}}
 			>
 				<Users size={16} />
 				<span>Groups</span>
@@ -57,11 +68,11 @@
 	<div class="body-bottom h-full flex-grow container mx-auto py-4 px-2 w-[50rem]">
 		{#if lists.loading}
 			<div class="flex items-center justify-center py-12">
-				<p class="text-[#8c7b73]">Loading your lists...</p>
+				<p style="color: var(--todo-text-secondary);">Loading your lists...</p>
 			</div>
 		{:else if lists.error}
 			<div class="flex items-center justify-center py-12">
-				<p class="text-red-500">{lists.error}</p>
+				<p style="color: var(--todo-error-text);">{lists.error}</p>
 			</div>
 		{:else}
 			<div class="todoLists">
@@ -69,33 +80,45 @@
 					{#each lists as list (list.id)}
 						<div
 							onclick={() => goto(`/todos/${list.id}`)}
-							class="flex justify-between items-center w-full my-2 py-4 flex gap-2 items-center px-2 border border-stone-200 rounded-lg
-							hover:card-shadow-hover hover:-translate-y-0.5 cursor-pointer transition-all duration-150
-							bg-white p-4 rounded-lg hover:shadow-md active:scale-95"
+							class="flex justify-between items-center w-full my-2 py-4 flex gap-2 items-center px-2 rounded-lg
+							cursor-pointer transition-all duration-150
+							p-4 rounded-lg active:scale-95"
+							style="background-color: var(--todo-card-bg); border: 1px solid var(--todo-card-border); box-shadow: var(--todo-shadow);"
+							onmouseenter={(e) => {
+								e.currentTarget.style.boxShadow = 'var(--todo-shadow-hover)';
+								e.currentTarget.style.transform = 'translateY(-2px)';
+							}}
+							onmouseleave={(e) => {
+								e.currentTarget.style.boxShadow = 'var(--todo-shadow)';
+								e.currentTarget.style.transform = 'translateY(0)';
+							}}
 						>
 							<a class="w-full flex gap-2 items-center flex gap-8 mx-4">
 								<svelte:component this={list.icon} style={`color: ${list.theme}`} />
 								<div class="descriptions">
-									<div class="name">
+									<div class="name" style="color: var(--todo-text-primary);">
 										{list.name}
 									</div>
-									<div class="description text-sm text-gray-500">
+									<div class="description text-sm" style="color: var(--todo-text-secondary);">
 										{list.description || ''}
 									</div>
 									<div class="w-[10rem] mt-2">
-										<div class="h-2 bg-gray-200 rounded-full overflow-hidden w-full">
+										<div
+											class="h-2 rounded-full overflow-hidden w-full"
+											style="background-color: var(--todo-progress-track);"
+										>
 											<div
 												class="h-full rounded-full"
 												style={`width: ${progress(list)}%; background-color: ${list.theme}`}
 											/>
 										</div>
-										<div class="text-xs text-gray-500 mt-1">
+										<div class="text-xs mt-1" style="color: var(--todo-text-secondary);">
 											{counts(list).done}/{counts(list).total} todos
 										</div>
 									</div>
 								</div>
 							</a>
-							<div>
+							<div style="color: var(--todo-text-secondary);">
 								<ChevronRight />
 							</div>
 						</div>
@@ -103,7 +126,7 @@
 				</ul>
 
 				{#if lists.length === 0}
-					<p>No lists yet 👀</p>
+					<p style="color: var(--todo-text-secondary);">No lists yet 👀</p>
 				{/if}
 			</div>
 		{/if}
@@ -120,16 +143,16 @@
 	h-[3.5rem]
 	right-6
 	z-50
-	c-white
-	bg-[#e76e50]
 	p-4
 	text-white
-	shadow-lg
 	transition
 	active:scale-95
 	focus:outline-none
-	rounded-md shadow-lg hover:shadow-xl transition-all hover:scale-105 active:scale-95
+	rounded-md hover:scale-105 active:scale-95
 "
+	style="background-color: var(--todo-btn-primary-bg); box-shadow: var(--todo-shadow-hover);"
+	onmouseenter={(e) => (e.currentTarget.style.backgroundColor = 'var(--todo-btn-primary-hover)')}
+	onmouseleave={(e) => (e.currentTarget.style.backgroundColor = 'var(--todo-btn-primary-bg)')}
 >
 	<Plus />
 </button>

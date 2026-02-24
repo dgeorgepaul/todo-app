@@ -50,26 +50,36 @@
 
 {#if loading}
 	<div class="flex items-center justify-center h-full min-h-[50vh]">
-		<p class="text-[#8c7b73]">Loading list...</p>
+		<p style="color: var(--todo-text-secondary);">Loading list...</p>
 	</div>
 {:else if errorState === 'not_found'}
 	<div class="flex flex-col items-center justify-center h-full min-h-[50vh] gap-4">
-		<h2 class="text-2xl font-bold text-[#2c2421]">List Not Found</h2>
-		<p class="text-[#8c7b73]">This list doesn't exist or you don't have access to it.</p>
+		<h2 class="text-2xl font-bold" style="color: var(--todo-text-primary);">List Not Found</h2>
+		<p style="color: var(--todo-text-secondary);">
+			This list doesn't exist or you don't have access to it.
+		</p>
 		<a
 			href="/todos"
-			class="px-6 py-3 bg-[#e76e50] text-white font-medium rounded-lg hover:bg-[#d45d40] transition-all"
+			class="px-6 py-3 font-medium rounded-lg transition-all"
+			style="background-color: var(--todo-btn-primary-bg); color: var(--todo-btn-primary-text);"
+			onmouseenter={(e) =>
+				(e.currentTarget.style.backgroundColor = 'var(--todo-btn-primary-hover)')}
+			onmouseleave={(e) => (e.currentTarget.style.backgroundColor = 'var(--todo-btn-primary-bg)')}
 		>
 			Go to My Lists
 		</a>
 	</div>
 {:else if errorState}
 	<div class="flex flex-col items-center justify-center h-full min-h-[50vh] gap-4">
-		<h2 class="text-2xl font-bold text-[#2c2421]">Error</h2>
-		<p class="text-red-500">{errorState}</p>
+		<h2 class="text-2xl font-bold" style="color: var(--todo-text-primary);">Error</h2>
+		<p style="color: var(--todo-error-text);">{errorState}</p>
 		<a
 			href="/todos"
-			class="px-6 py-3 bg-[#e76e50] text-white font-medium rounded-lg hover:bg-[#d45d40] transition-all"
+			class="px-6 py-3 font-medium rounded-lg transition-all"
+			style="background-color: var(--todo-btn-primary-bg); color: var(--todo-btn-primary-text);"
+			onmouseenter={(e) =>
+				(e.currentTarget.style.backgroundColor = 'var(--todo-btn-primary-hover)')}
+			onmouseleave={(e) => (e.currentTarget.style.backgroundColor = 'var(--todo-btn-primary-bg)')}
 		>
 			Go to My Lists
 		</a>
@@ -78,6 +88,6 @@
 	<TodoListView {list} />
 {:else}
 	<div class="flex items-center justify-center h-full min-h-[50vh]">
-		<p class="text-[#8c7b73]">List not found</p>
+		<p style="color: var(--todo-text-secondary);">List not found</p>
 	</div>
 {/if}

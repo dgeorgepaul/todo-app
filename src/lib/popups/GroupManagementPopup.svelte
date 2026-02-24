@@ -134,23 +134,38 @@
 	}
 </script>
 
-<div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-	<div class="bg-white rounded-xl p-6 w-[28rem] relative max-h-[80vh] overflow-y-auto">
+<!-- svelte-ignore a11y_no_static_element_interactions -->
+<div
+	class="fixed inset-0 flex items-center justify-center z-50"
+	style="background-color: var(--todo-overlay-bg);"
+	onclick={onClose}
+>
+	<!-- svelte-ignore a11y_no_static_element_interactions -->
+	<div
+		class="rounded-xl p-6 w-[28rem] relative max-h-[80vh] overflow-y-auto"
+		style="background-color: var(--todo-card-bg); box-shadow: var(--todo-shadow-hover);"
+		onclick={(e) => e.stopPropagation()}
+	>
 		<button
-			class="cursor-pointer absolute top-5 right-5 text-gray-500 hover:text-gray-700"
+			class="cursor-pointer absolute top-5 right-5 transition-colors"
+			style="color: var(--todo-text-secondary);"
 			onclick={onClose}
 		>
 			✕
 		</button>
 
 		{#if error}
-			<div class="mb-3 mr-6 p-2 rounded-lg bg-red-50 border border-red-200 text-red-600 text-sm">
+			<div
+				class="mb-3 mr-6 p-2 rounded-lg text-sm"
+				style="background-color: var(--todo-error-bg); border: 1px solid var(--todo-error-border); color: var(--todo-error-text);"
+			>
 				{error}
 			</div>
 		{/if}
 		{#if success}
 			<div
-				class="mb-3 mr-6 p-2 rounded-lg bg-green-50 border border-green-200 text-green-600 text-sm"
+				class="mb-3 mr-6 p-2 rounded-lg text-sm"
+				style="background-color: var(--todo-success-bg); border: 1px solid var(--todo-success-border); color: var(--todo-success-text);"
 			>
 				{success}
 			</div>
@@ -159,33 +174,46 @@
 		{#if !selectedGroup}
 			<!-- Groups List View -->
 			<div class="flex items-center gap-2 mb-4">
-				<Users size={20} class="text-[#e76e50]" />
-				<h2 class="text-xl font-semibold text-[#2c2421]">My Groups</h2>
+				<Users size={20} style="color: var(--todo-link-color);" />
+				<h2 class="text-xl font-semibold" style="color: var(--todo-text-primary);">My Groups</h2>
 			</div>
 
 			{#if loading}
-				<p class="text-[#8c7b73] text-sm py-4 text-center">Loading groups...</p>
+				<p class="text-sm py-4 text-center" style="color: var(--todo-text-secondary);">
+					Loading groups...
+				</p>
 			{:else}
 				<div class="flex flex-col gap-2">
 					{#each groups as group (group.id)}
 						<button
 							onclick={() => selectGroup(group)}
-							class="w-full text-left px-4 py-3 rounded-lg border border-stone-200 bg-white
-							hover:shadow-md hover:-translate-y-0.5 cursor-pointer transition-all duration-150 flex items-center justify-between"
+							class="w-full text-left px-4 py-3 rounded-lg
+							cursor-pointer transition-all duration-150 flex items-center justify-between"
+							style="background-color: var(--todo-card-bg); border: 1px solid var(--todo-card-border);"
+							onmouseenter={(e) => {
+								e.currentTarget.style.boxShadow = 'var(--todo-shadow-hover)';
+								e.currentTarget.style.transform = 'translateY(-2px)';
+							}}
+							onmouseleave={(e) => {
+								e.currentTarget.style.boxShadow = 'none';
+								e.currentTarget.style.transform = 'translateY(0)';
+							}}
 						>
 							<div>
-								<div class="font-medium text-[#2c2421]">{group.name}</div>
-								<div class="text-xs text-[#8c7b73]">
+								<div class="font-medium" style="color: var(--todo-text-primary);">{group.name}</div>
+								<div class="text-xs" style="color: var(--todo-text-secondary);">
 									{group.members.length}
 									{group.members.length === 1 ? 'member' : 'members'}
 								</div>
 							</div>
-							<div class="text-[#8c7b73]">→</div>
+							<div style="color: var(--todo-text-secondary);">→</div>
 						</button>
 					{/each}
 
 					{#if groups.length === 0}
-						<p class="text-[#8c7b73] text-sm text-center py-4">No groups yet</p>
+						<p class="text-sm text-center py-4" style="color: var(--todo-text-secondary);">
+							No groups yet
+						</p>
 					{/if}
 				</div>
 
@@ -195,19 +223,28 @@
 						<input
 							placeholder="Group name"
 							bind:value={newGroupName}
-							class="flex-grow border border-stone-300 px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#e76e50] focus:border-transparent"
+							class="flex-grow px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring-2"
+							style="background-color: var(--todo-input-bg); border: 1px solid var(--todo-input-border); color: var(--todo-text-primary); --tw-ring-color: var(--color-primary-500);"
 						/>
 						<button
 							type="submit"
 							disabled={creatingGroup}
-							class="px-4 py-2 bg-[#e76e50] text-white rounded-lg text-sm cursor-pointer hover:bg-[#d45d40] transition-all disabled:opacity-50"
+							class="px-4 py-2 rounded-lg text-sm cursor-pointer transition-all disabled:opacity-50"
+							style="background-color: var(--todo-btn-primary-bg); color: var(--todo-btn-primary-text);"
+							onmouseenter={(e) =>
+								(e.currentTarget.style.backgroundColor = 'var(--todo-btn-primary-hover)')}
+							onmouseleave={(e) =>
+								(e.currentTarget.style.backgroundColor = 'var(--todo-btn-primary-bg)')}
 						>
 							{creatingGroup ? '...' : 'Create'}
 						</button>
 						<button
 							type="button"
 							onclick={() => (showCreateGroup = false)}
-							class="px-3 py-2 text-[#8c7b73] rounded-lg text-sm cursor-pointer hover:bg-stone-100 transition-all"
+							class="px-3 py-2 rounded-lg text-sm cursor-pointer transition-all"
+							style="color: var(--todo-text-secondary);"
+							onmouseenter={(e) => (e.currentTarget.style.backgroundColor = 'var(--todo-hover-bg)')}
+							onmouseleave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
 						>
 							Cancel
 						</button>
@@ -215,8 +252,17 @@
 				{:else}
 					<button
 						onclick={() => (showCreateGroup = true)}
-						class="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-dashed border-stone-300 text-[#8c7b73]
-						hover:border-[#e76e50] hover:text-[#e76e50] cursor-pointer transition-all text-sm"
+						class="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg
+						cursor-pointer transition-all text-sm"
+						style="border: 1px dashed var(--todo-dashed-border); color: var(--todo-text-secondary);"
+						onmouseenter={(e) => {
+							e.currentTarget.style.borderColor = 'var(--todo-link-color)';
+							e.currentTarget.style.color = 'var(--todo-link-color)';
+						}}
+						onmouseleave={(e) => {
+							e.currentTarget.style.borderColor = 'var(--todo-dashed-border)';
+							e.currentTarget.style.color = 'var(--todo-text-secondary)';
+						}}
 					>
 						<Plus size={16} />
 						<span>Create New Group</span>
@@ -228,33 +274,46 @@
 			<div class="flex items-center gap-3 mb-4">
 				<button
 					onclick={goBack}
-					class="cursor-pointer text-[#8c7b73] hover:text-[#2c2421] transition-colors"
+					class="cursor-pointer transition-colors"
+					style="color: var(--todo-text-secondary);"
+					onmouseenter={(e) => (e.currentTarget.style.color = 'var(--todo-text-primary)')}
+					onmouseleave={(e) => (e.currentTarget.style.color = 'var(--todo-text-secondary)')}
 				>
 					<ArrowLeft size={20} />
 				</button>
 				<div>
-					<h2 class="text-xl font-semibold text-[#2c2421]">{selectedGroup.name}</h2>
+					<h2 class="text-xl font-semibold" style="color: var(--todo-text-primary);">
+						{selectedGroup.name}
+					</h2>
 				</div>
 			</div>
 
-			<h3 class="text-sm font-medium text-[#8c7b73] mb-2">Members</h3>
+			<h3 class="text-sm font-medium mb-2" style="color: var(--todo-text-secondary);">Members</h3>
 
 			{#if membersLoading}
-				<p class="text-[#8c7b73] text-sm py-4 text-center">Loading members...</p>
+				<p class="text-sm py-4 text-center" style="color: var(--todo-text-secondary);">
+					Loading members...
+				</p>
 			{:else}
 				<div class="flex flex-col gap-1">
 					{#each members as member (member.id)}
 						{@const isOwner = member.user.id === selectedGroup.admin_id}
 						<div
-							class="flex items-center justify-between px-3 py-2 rounded-lg {isOwner
-								? 'bg-amber-50'
-								: 'hover:bg-stone-50'} transition-colors"
+							class="flex items-center justify-between px-3 py-2 rounded-lg transition-colors"
+							style="background-color: {isOwner ? 'var(--todo-badge-owner-bg)' : 'transparent'};"
+							onmouseenter={(e) => {
+								if (!isOwner) e.currentTarget.style.backgroundColor = 'var(--todo-hover-bg)';
+							}}
+							onmouseleave={(e) => {
+								if (!isOwner) e.currentTarget.style.backgroundColor = 'transparent';
+							}}
 						>
 							<div class="flex items-center gap-3">
 								<div
-									class="w-8 h-8 rounded-full {isOwner
-										? 'bg-amber-500'
-										: 'bg-[#e76e50]'} text-white flex items-center justify-center text-sm font-medium"
+									class="w-8 h-8 rounded-full text-white flex items-center justify-center text-sm font-medium"
+									style="background-color: {isOwner
+										? 'var(--todo-avatar-owner-bg)'
+										: 'var(--todo-avatar-accent-bg)'};"
 								>
 									{#if isOwner}
 										👑
@@ -263,23 +322,29 @@
 									{/if}
 								</div>
 								<div>
-									<div class="text-sm font-medium text-[#2c2421]">
+									<div class="text-sm font-medium" style="color: var(--todo-text-primary);">
 										{member.user.full_name || member.user.username}
 										{#if isOwner}
 											<span
-												class="ml-1.5 text-xs font-medium text-amber-600 bg-amber-100 px-1.5 py-0.5 rounded-full"
+												class="ml-1.5 text-xs font-medium px-1.5 py-0.5 rounded-full"
+												style="color: var(--todo-badge-owner-text); background-color: var(--todo-badge-owner-bg);"
 												>Owner</span
 											>
 										{/if}
 									</div>
-									<div class="text-xs text-[#8c7b73]">@{member.user.username}</div>
+									<div class="text-xs" style="color: var(--todo-text-secondary);">
+										@{member.user.username}
+									</div>
 								</div>
 							</div>
 							{#if !isOwner}
 								<button
 									onclick={() => handleRemoveMember(member.user.id, member.user.username)}
-									class="text-red-400 hover:text-red-600 cursor-pointer transition-colors p-1"
+									class="cursor-pointer transition-colors p-1"
 									title="Remove member"
+									style="color: var(--todo-delete-color);"
+									onmouseenter={(e) => (e.currentTarget.style.color = 'var(--todo-delete-hover)')}
+									onmouseleave={(e) => (e.currentTarget.style.color = 'var(--todo-delete-color)')}
 								>
 									<Trash2 size={14} />
 								</button>
@@ -294,19 +359,28 @@
 						<input
 							placeholder="Username to invite"
 							bind:value={inviteUsername}
-							class="flex-grow border border-stone-300 px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#e76e50] focus:border-transparent"
+							class="flex-grow px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring-2"
+							style="background-color: var(--todo-input-bg); border: 1px solid var(--todo-input-border); color: var(--todo-text-primary); --tw-ring-color: var(--color-primary-500);"
 						/>
 						<button
 							type="submit"
 							disabled={inviting}
-							class="px-4 py-2 bg-[#e76e50] text-white rounded-lg text-sm cursor-pointer hover:bg-[#d45d40] transition-all disabled:opacity-50"
+							class="px-4 py-2 rounded-lg text-sm cursor-pointer transition-all disabled:opacity-50"
+							style="background-color: var(--todo-btn-primary-bg); color: var(--todo-btn-primary-text);"
+							onmouseenter={(e) =>
+								(e.currentTarget.style.backgroundColor = 'var(--todo-btn-primary-hover)')}
+							onmouseleave={(e) =>
+								(e.currentTarget.style.backgroundColor = 'var(--todo-btn-primary-bg)')}
 						>
 							{inviting ? '...' : 'Invite'}
 						</button>
 						<button
 							type="button"
 							onclick={() => (showInvite = false)}
-							class="px-3 py-2 text-[#8c7b73] rounded-lg text-sm cursor-pointer hover:bg-stone-100 transition-all"
+							class="px-3 py-2 rounded-lg text-sm cursor-pointer transition-all"
+							style="color: var(--todo-text-secondary);"
+							onmouseenter={(e) => (e.currentTarget.style.backgroundColor = 'var(--todo-hover-bg)')}
+							onmouseleave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
 						>
 							Cancel
 						</button>
@@ -314,8 +388,17 @@
 				{:else}
 					<button
 						onclick={() => (showInvite = true)}
-						class="mt-3 w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-dashed border-stone-300 text-[#8c7b73]
-						hover:border-[#e76e50] hover:text-[#e76e50] cursor-pointer transition-all text-sm"
+						class="mt-3 w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg
+						cursor-pointer transition-all text-sm"
+						style="border: 1px dashed var(--todo-dashed-border); color: var(--todo-text-secondary);"
+						onmouseenter={(e) => {
+							e.currentTarget.style.borderColor = 'var(--todo-link-color)';
+							e.currentTarget.style.color = 'var(--todo-link-color)';
+						}}
+						onmouseleave={(e) => {
+							e.currentTarget.style.borderColor = 'var(--todo-dashed-border)';
+							e.currentTarget.style.color = 'var(--todo-text-secondary)';
+						}}
 					>
 						<UserPlus size={16} />
 						<span>Invite Member</span>

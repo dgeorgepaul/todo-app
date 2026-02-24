@@ -63,36 +63,61 @@
 	}
 </script>
 
-<div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-	<div class="bg-white rounded-xl p-6 w-100 relative">
-		<button class="cursor-pointer absolute top-5 right-5 text-gray-500" onclick={onClose}>
+<!-- svelte-ignore a11y_no_static_element_interactions -->
+<div
+	class="fixed inset-0 flex items-center justify-center z-50"
+	style="background-color: var(--todo-overlay-bg);"
+	onclick={onClose}
+>
+	<!-- svelte-ignore a11y_no_static_element_interactions -->
+	<div
+		class="rounded-xl p-6 w-100 relative"
+		style="background-color: var(--todo-card-bg); box-shadow: var(--todo-shadow-hover);"
+		onclick={(e) => e.stopPropagation()}
+	>
+		<button
+			class="cursor-pointer absolute top-5 right-5"
+			style="color: var(--todo-text-secondary);"
+			onclick={onClose}
+		>
 			✕
 		</button>
 
-		<h2 class="text-xl font-semibold mb-2">Create New List</h2>
+		<h2 class="text-xl font-semibold mb-2" style="color: var(--todo-text-primary);">
+			Create New List
+		</h2>
 
 		{#if error}
-			<div class="mb-3 p-2 rounded-lg bg-red-50 border border-red-200 text-red-600 text-sm">
+			<div
+				class="mb-3 p-2 rounded-lg text-sm"
+				style="background-color: var(--todo-error-bg); border: 1px solid var(--todo-error-border); color: var(--todo-error-text);"
+			>
 				{error}
 			</div>
 		{/if}
 
 		<form onsubmit={submit} class="flex flex-col gap-3">
 			<!-- svelte-ignore a11y_label_has_associated_control -->
-			<label class="text-sm">Name</label>
+			<label class="text-sm" style="color: var(--todo-text-primary);">Name</label>
 
-			<input placeholder="Enter list name" bind:value={name} class="border px-3 py-2 rounded" />
+			<input
+				placeholder="Enter list name"
+				bind:value={name}
+				class="px-3 py-2 rounded transition-all focus:outline-none focus:ring-2"
+				style="background-color: var(--todo-input-bg); border: 1px solid var(--todo-input-border); color: var(--todo-text-primary); --tw-ring-color: var(--color-primary-500);"
+			/>
 			<!-- svelte-ignore a11y_label_has_associated_control -->
-			<label class="text-sm">Description (optional)</label>
+			<label class="text-sm" style="color: var(--todo-text-primary);">Description (optional)</label>
 
 			<input
 				placeholder="Enter list description"
 				bind:value={description}
-				class="border px-3 py-2 rounded"
+				class="px-3 py-2 rounded transition-all focus:outline-none focus:ring-2"
+				style="background-color: var(--todo-input-bg); border: 1px solid var(--todo-input-border); color: var(--todo-text-primary); --tw-ring-color: var(--color-primary-500);"
 			/>
 
 			<!-- svelte-ignore a11y_label_has_associated_control -->
-			<label class="text-sm">Theme</label>
+			<label class="text-sm" style="color: var(--todo-text-primary);">Theme</label>
 			<div class="flex gap-3">
 				{#each themes as t}
 					<button
@@ -108,7 +133,7 @@
 				{/each}
 			</div>
 
-			<label class="text-sm">Icon</label>
+			<label class="text-sm" style="color: var(--todo-text-primary);">Icon</label>
 			<div class="flex gap-3 w-full flex-wrap" style="color: {theme}">
 				{#each Object.keys(ICONS) as icon}
 					<div
@@ -135,7 +160,12 @@
 				<button
 					type="submit"
 					disabled={submitting}
-					class="px-3 py-3 bg-blue-500 text-white rounded w-full cursor-pointer disabled:opacity-50"
+					class="px-3 py-3 rounded w-full cursor-pointer disabled:opacity-50 transition-all"
+					style="background-color: var(--todo-btn-primary-bg); color: var(--todo-btn-primary-text);"
+					onmouseenter={(e) =>
+						(e.currentTarget.style.backgroundColor = 'var(--todo-btn-primary-hover)')}
+					onmouseleave={(e) =>
+						(e.currentTarget.style.backgroundColor = 'var(--todo-btn-primary-bg)')}
 				>
 					{submitting ? 'Creating...' : 'Create List'}
 				</button>

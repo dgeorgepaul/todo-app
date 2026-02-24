@@ -50,27 +50,39 @@
 </script>
 
 <div class="flex flex-col w-full">
-	<nav class="border-b-stone-200 border-b-1 bg-[#fcfaf8cc]">
+	<nav
+		style="border-bottom: 1px solid var(--todo-header-border); background-color: var(--todo-nav-bg);"
+	>
 		<div
 			class="container mx-auto py-4 px-2 w-[50rem] container mx-auto py-4 px-2 flex items-center gap-4 flex-row justify-between"
 		>
 			<div class="flex items-center gap-4">
 				<ArrowLeft
-					class="cursor-pointer hover:bg-[#f0f0f0] rounded-lg p-2 h-10 w-10"
+					class="cursor-pointer rounded-lg p-2 h-10 w-10 transition-colors"
+					style="color: var(--todo-text-primary);"
 					onclick={() => history.back()}
 				/>
 				<div>
-					<h1 style="color: {list.theme}" class="font-semibold text-[#2c2421] text-lg">
+					<h1 style="color: {list.theme}" class="font-semibold text-lg">
 						{list.name}
 					</h1>
-					<p class="font-light text-[#8c7b73] text-base">
+					<p class="font-light text-base" style="color: var(--todo-text-secondary);">
 						{list.todos.length - remaining} of {list.todos.length} tasks completed
 					</p>
 				</div>
 			</div>
 			<button
 				onclick={() => (showSharePopup = true)}
-				class="flex items-center gap-2 text-sm text-[#8c7b73] hover:text-[#e76e50] cursor-pointer transition-colors px-3 py-2 rounded-lg hover:bg-stone-100"
+				class="flex items-center gap-2 text-sm cursor-pointer transition-colors px-3 py-2 rounded-lg"
+				style="color: var(--todo-text-secondary);"
+				onmouseenter={(e) => {
+					e.currentTarget.style.color = 'var(--todo-link-color)';
+					e.currentTarget.style.backgroundColor = 'var(--todo-hover-bg)';
+				}}
+				onmouseleave={(e) => {
+					e.currentTarget.style.color = 'var(--todo-text-secondary)';
+					e.currentTarget.style.backgroundColor = 'transparent';
+				}}
 			>
 				<Share2 size={16} />
 				<span>Share</span>
@@ -79,12 +91,13 @@
 	</nav>
 	<div class="body-bottom h-full gap-4 flex flex-col container mx-auto py-4 px-2 w-[50rem]">
 		<div class="flex flex-col gap-2">
-			<label class="text-sm">Create New To-Do</label>
+			<label class="text-sm" style="color: var(--todo-text-primary);">Create New To-Do</label>
 
 			<input
 				placeholder="Enter To-Do"
 				bind:value={newTodo}
-				class="border px-3 py-2 rounded bg-white"
+				class="px-3 py-2 rounded transition-all focus:outline-none focus:ring-2"
+				style="background-color: var(--todo-input-bg); border: 1px solid var(--todo-input-border); color: var(--todo-text-primary); --tw-ring-color: var(--color-primary-500);"
 				disabled={addingTodo}
 				onkeydown={(e: KeyboardEvent) => e.key === 'Enter' && addTodo()}
 			/>
@@ -92,14 +105,16 @@
 
 		<!-- Active todos -->
 		<div>
-			<h2 class="text-lg font-semibold mb-3 text-gray-500">TO DO</h2>
+			<h2 class="text-lg font-semibold mb-3" style="color: var(--todo-text-secondary);">TO DO</h2>
 			<ul
-				class="space-y-2 bg-white py-2 px-4 rounded-lg border border-gray-200 flex flex-col gap-2"
+				class="space-y-2 py-2 px-4 rounded-lg flex flex-col gap-2"
+				style="background-color: var(--todo-card-bg); border: 1px solid var(--todo-card-border);"
 			>
 				{#each list.todos.filter((t) => !t.done) as todo, index (todo.id)}
 					<div
-						class={index < list.todos.filter((t) => !t.done).length - 1
-							? 'border-b-2 border-b-stone-200 pb-0 m-0'
+						class={index < list.todos.filter((t) => !t.done).length - 1 ? 'pb-0 m-0' : ''}
+						style={index < list.todos.filter((t) => !t.done).length - 1
+							? 'border-bottom: 2px solid var(--todo-card-border);'
 							: ''}
 						animate:flip={{ duration: 250, easing: cubicOut }}
 					>
@@ -113,27 +128,30 @@
 					</div>
 				{/each}
 				{#if list.todos.filter((t) => !t.done).length === 0 && list.todos.length > 0 && all_todos_completed}
-					<p in:fade={{ duration: 200 }} class="text-gray-400 text-sm">All todos completed!</p>
+					<p in:fade={{ duration: 200 }} class="text-sm" style="color: var(--todo-text-muted);">
+						All todos completed!
+					</p>
 				{/if}
 				{#if list.todos.length === 0}
-					<p class="text-gray-400 text-sm">No todos yet 👀</p>
+					<p class="text-sm" style="color: var(--todo-text-muted);">No todos yet 👀</p>
 				{/if}
 			</ul>
 		</div>
 
 		<!-- Completed todos -->
 		<div>
-			<h2 class="text-lg font-semibold mb-3 text-gray-500">
+			<h2 class="text-lg font-semibold mb-3" style="color: var(--todo-text-secondary);">
 				Completed ({list.todos.filter((t) => t.done).length})
 			</h2>
 			<ul
-				class="space-y-2 bg-white py-2 px-4 rounded-lg border border-gray-200 flex flex-col gap-2"
+				class="space-y-2 py-2 px-4 rounded-lg flex flex-col gap-2"
+				style="background-color: var(--todo-card-bg); border: 1px solid var(--todo-card-border);"
 			>
 				{#each list.todos.filter((t) => t.done) as todo, index (todo.id)}
 					<div
 						animate:flip={{ duration: 250, easing: cubicOut }}
-						class={index < list.todos.filter((t) => t.done).length - 1
-							? 'border-b-2 border-b-stone-200'
+						style={index < list.todos.filter((t) => t.done).length - 1
+							? 'border-bottom: 2px solid var(--todo-card-border);'
 							: ''}
 					>
 						<TodoItem
@@ -146,10 +164,12 @@
 					</div>
 				{/each}
 				{#if list.todos.filter((t) => t.done).length === 0 && list.todos.length > 0 && all_todos_completed}
-					<p in:fade={{ duration: 200 }} class="text-gray-400 text-sm">Better Get To Work!</p>
+					<p in:fade={{ duration: 200 }} class="text-sm" style="color: var(--todo-text-muted);">
+						Better Get To Work!
+					</p>
 				{/if}
 				{#if list.todos.length === 0}
-					<p class="text-gray-400 text-sm">No todos yet 👀</p>
+					<p class="text-sm" style="color: var(--todo-text-muted);">No todos yet 👀</p>
 				{/if}
 			</ul>
 		</div>

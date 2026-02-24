@@ -1,20 +1,145 @@
 @import "tailwindcss";
-/* app.css */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "@skeletonlabs/skeleton";
+@import "@skeletonlabs/skeleton/themes/cerberus";
+
+/* ===== Light mode (default) ===== */
+:root {
+  --color-surface-50: #fcfaf8;
+  --color-surface-100: #ffffff;
+  --color-surface-200: #f5f0ec;
+  --color-surface-300: #d6cdc6;
+  --color-surface-400: #b8a99e;
+  --color-surface-500: #8c7b73;
+  --color-surface-600: #6b5d55;
+  --color-surface-700: #4a3f39;
+  --color-surface-800: #3a312c;
+  --color-surface-900: #2c2421;
+
+  --color-primary-400: #f08770;
+  --color-primary-500: #e76e50;
+  --color-primary-600: #d45d40;
+  --color-primary-700: #c04e33;
+
+  --color-error-light-bg: #fef2f2;
+  --color-error-light-border: #fecaca;
+  --color-error-light-text: #dc2626;
+
+  --color-success-light-bg: #f0fdf4;
+  --color-success-light-border: #bbf7d0;
+  --color-success-light-text: #16a34a;
+
+  --todo-body-bg: var(--color-surface-50);
+  --todo-card-bg: var(--color-surface-100);
+  --todo-card-border: var(--color-surface-300);
+  --todo-text-primary: var(--color-surface-900);
+  --todo-text-secondary: var(--color-surface-500);
+  --todo-text-muted: var(--color-surface-400);
+  --todo-input-bg: var(--color-surface-100);
+  --todo-input-border: var(--color-surface-300);
+  --todo-header-bg: var(--color-surface-100);
+  --todo-header-border: var(--color-surface-300);
+  --todo-hover-bg: var(--color-surface-200);
+  --todo-nav-bg: rgba(252, 250, 248, 0.8);
+  --todo-overlay-bg: rgba(0, 0, 0, 0.5);
+  --todo-link-color: var(--color-primary-500);
+  --todo-link-hover: var(--color-primary-600);
+  --todo-btn-primary-bg: var(--color-primary-500);
+  --todo-btn-primary-hover: var(--color-primary-600);
+  --todo-btn-primary-text: #ffffff;
+  --todo-progress-track: #e5e7eb;
+  --todo-checkbox-border: #d1d5db;
+  --todo-checkbox-hover-border: #9ca3af;
+  --todo-delete-color: #ef4444;
+  --todo-delete-hover: #dc2626;
+  --todo-error-bg: var(--color-error-light-bg);
+  --todo-error-border: var(--color-error-light-border);
+  --todo-error-text: var(--color-error-light-text);
+  --todo-success-bg: var(--color-success-light-bg);
+  --todo-success-border: var(--color-success-light-border);
+  --todo-success-text: var(--color-success-light-text);
+  --todo-badge-owner-bg: #fef3c7;
+  --todo-badge-owner-text: #d97706;
+  --todo-badge-owner-border: #fde68a;
+  --todo-avatar-owner-bg: #f59e0b;
+  --todo-avatar-accent-bg: var(--color-primary-500);
+  --todo-badge-access-bg: #d1fae5;
+  --todo-badge-access-text: #059669;
+  --todo-avatar-access-bg: #10b981;
+  --todo-dashed-border: var(--color-surface-300);
+  --todo-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --todo-shadow-hover: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* ===== Dark mode ===== */
+.dark {
+  --color-surface-50: #1a1a2e;
+  --color-surface-100: #1e1e33;
+  --color-surface-200: #25253d;
+  --color-surface-300: #3a3a52;
+  --color-surface-400: #6b6b80;
+  --color-surface-500: #9090a3;
+  --color-surface-600: #b0b0bf;
+  --color-surface-700: #d0d0da;
+  --color-surface-800: #e8e8ee;
+  --color-surface-900: #f5f5f7;
+
+  --color-primary-400: #f08770;
+  --color-primary-500: #e76e50;
+  --color-primary-600: #f08770;
+  --color-primary-700: #f5a08a;
+
+  --todo-body-bg: var(--color-surface-50);
+  --todo-card-bg: var(--color-surface-100);
+  --todo-card-border: var(--color-surface-300);
+  --todo-text-primary: var(--color-surface-900);
+  --todo-text-secondary: var(--color-surface-500);
+  --todo-text-muted: var(--color-surface-400);
+  --todo-input-bg: var(--color-surface-200);
+  --todo-input-border: var(--color-surface-300);
+  --todo-header-bg: var(--color-surface-100);
+  --todo-header-border: var(--color-surface-300);
+  --todo-hover-bg: var(--color-surface-200);
+  --todo-nav-bg: rgba(26, 26, 46, 0.8);
+  --todo-overlay-bg: rgba(0, 0, 0, 0.7);
+  --todo-link-color: var(--color-primary-400);
+  --todo-link-hover: var(--color-primary-500);
+  --todo-btn-primary-bg: var(--color-primary-500);
+  --todo-btn-primary-hover: var(--color-primary-400);
+  --todo-btn-primary-text: #ffffff;
+  --todo-progress-track: var(--color-surface-300);
+  --todo-checkbox-border: var(--color-surface-400);
+  --todo-checkbox-hover-border: var(--color-surface-500);
+  --todo-delete-color: #f87171;
+  --todo-delete-hover: #ef4444;
+  --todo-error-bg: rgba(220, 38, 38, 0.15);
+  --todo-error-border: rgba(220, 38, 38, 0.3);
+  --todo-error-text: #fca5a5;
+  --todo-success-bg: rgba(22, 163, 74, 0.15);
+  --todo-success-border: rgba(22, 163, 74, 0.3);
+  --todo-success-text: #86efac;
+  --todo-badge-owner-bg: rgba(245, 158, 11, 0.2);
+  --todo-badge-owner-text: #fbbf24;
+  --todo-badge-owner-border: rgba(245, 158, 11, 0.3);
+  --todo-avatar-owner-bg: #d97706;
+  --todo-avatar-accent-bg: var(--color-primary-500);
+  --todo-badge-access-bg: rgba(16, 185, 129, 0.2);
+  --todo-badge-access-text: #6ee7b7;
+  --todo-avatar-access-bg: #059669;
+  --todo-dashed-border: var(--color-surface-400);
+  --todo-shadow: 0 1px 3px rgba(0,0,0,0.2), 0 1px 2px rgba(0,0,0,0.15);
+  --todo-shadow-hover: 0 4px 12px rgba(0,0,0,0.3);
+}
 
 html {
-  @apply font-sans;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
-html,
-body {
+
+html, body {
   margin: 0;
   padding: 0;
   min-height: 100%;
-  background-color: #fcfaf8; /* example: slate-900 */
-  /* color: white; */
-  color: #333;
-font-family: system-ui, -apple-system, BlinkMacSystemFont,
-            "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: var(--todo-body-bg);
+  color: var(--todo-text-primary);
+  transition: background-color 0.2s ease, color 0.2s ease;
 }

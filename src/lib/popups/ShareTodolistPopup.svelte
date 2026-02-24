@@ -75,52 +75,84 @@
 	}
 </script>
 
-<div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-	<div class="bg-white rounded-xl p-6 w-[26rem] relative max-h-[70vh] overflow-y-auto">
+<!-- svelte-ignore a11y_no_static_element_interactions -->
+<div
+	class="fixed inset-0 flex items-center justify-center z-50"
+	style="background-color: var(--todo-overlay-bg);"
+	onclick={onClose}
+>
+	<!-- svelte-ignore a11y_no_static_element_interactions -->
+	<div
+		class="rounded-xl p-6 w-[26rem] relative max-h-[70vh] overflow-y-auto"
+		style="background-color: var(--todo-card-bg); box-shadow: var(--todo-shadow-hover);"
+		onclick={(e) => e.stopPropagation()}
+	>
 		<button
-			class="cursor-pointer absolute top-5 right-5 text-gray-500 hover:text-gray-700"
+			class="cursor-pointer absolute top-5 right-5 transition-colors"
+			style="color: var(--todo-text-secondary);"
 			onclick={onClose}
 		>
 			✕
 		</button>
 
 		<div class="flex items-center gap-2 mb-4">
-			<Share2 size={20} class="text-[#e76e50]" />
-			<h2 class="text-xl font-semibold text-[#2c2421]">Share List</h2>
+			<Share2 size={20} style="color: var(--todo-link-color);" />
+			<h2 class="text-xl font-semibold" style="color: var(--todo-text-primary);">Share List</h2>
 		</div>
 
 		{#if error}
-			<div class="mb-3 p-2 rounded-lg bg-red-50 border border-red-200 text-red-600 text-sm">
+			<div
+				class="mb-3 p-2 rounded-lg text-sm"
+				style="background-color: var(--todo-error-bg); border: 1px solid var(--todo-error-border); color: var(--todo-error-text);"
+			>
 				{error}
 			</div>
 		{/if}
 		{#if success}
-			<div class="mb-3 p-2 rounded-lg bg-green-50 border border-green-200 text-green-600 text-sm">
+			<div
+				class="mb-3 p-2 rounded-lg text-sm"
+				style="background-color: var(--todo-success-bg); border: 1px solid var(--todo-success-border); color: var(--todo-success-text);"
+			>
 				{success}
 			</div>
 		{/if}
 
 		{#if loading}
-			<p class="text-[#8c7b73] text-sm py-4 text-center">Loading groups...</p>
+			<p class="text-sm py-4 text-center" style="color: var(--todo-text-secondary);">
+				Loading groups...
+			</p>
 		{:else if !selectedGroup}
 			<!-- Step 1: Select a group -->
-			<p class="text-sm text-[#8c7b73] mb-3">Select a group to share with:</p>
+			<p class="text-sm mb-3" style="color: var(--todo-text-secondary);">
+				Select a group to share with:
+			</p>
 			<div class="flex flex-col gap-2">
 				{#each groups as group (group.id)}
 					<button
 						onclick={() => selectGroup(group)}
-						class="w-full text-left px-4 py-3 rounded-lg border border-stone-200 bg-white
-						hover:shadow-md hover:-translate-y-0.5 cursor-pointer transition-all duration-150"
+						class="w-full text-left px-4 py-3 rounded-lg
+						cursor-pointer transition-all duration-150"
+						style="background-color: var(--todo-card-bg); border: 1px solid var(--todo-card-border);"
+						onmouseenter={(e) => {
+							e.currentTarget.style.boxShadow = 'var(--todo-shadow-hover)';
+							e.currentTarget.style.transform = 'translateY(-2px)';
+						}}
+						onmouseleave={(e) => {
+							e.currentTarget.style.boxShadow = 'none';
+							e.currentTarget.style.transform = 'translateY(0)';
+						}}
 					>
-						<div class="font-medium text-[#2c2421]">{group.name}</div>
-						<div class="text-xs text-[#8c7b73]">
+						<div class="font-medium" style="color: var(--todo-text-primary);">{group.name}</div>
+						<div class="text-xs" style="color: var(--todo-text-secondary);">
 							{group.members.length}
 							{group.members.length === 1 ? 'member' : 'members'}
 						</div>
 					</button>
 				{/each}
 				{#if groups.length === 0}
-					<p class="text-[#8c7b73] text-sm text-center py-4">No groups available</p>
+					<p class="text-sm text-center py-4" style="color: var(--todo-text-secondary);">
+						No groups available
+					</p>
 				{/if}
 			</div>
 		{:else}
@@ -130,17 +162,24 @@
 					selectedGroup = null;
 					error = '';
 				}}
-				class="text-sm text-[#8c7b73] hover:text-[#2c2421] cursor-pointer transition-colors mb-3"
+				class="text-sm cursor-pointer transition-colors mb-3"
+				style="color: var(--todo-text-secondary);"
+				onmouseenter={(e) => (e.currentTarget.style.color = 'var(--todo-text-primary)')}
+				onmouseleave={(e) => (e.currentTarget.style.color = 'var(--todo-text-secondary)')}
 			>
 				← Back to groups
 			</button>
 
-			<p class="text-sm text-[#8c7b73] mb-3">
-				Share with a member of <strong>{selectedGroup.name}</strong>:
+			<p class="text-sm mb-3" style="color: var(--todo-text-secondary);">
+				Share with a member of <strong style="color: var(--todo-text-primary);"
+					>{selectedGroup.name}</strong
+				>:
 			</p>
 
 			{#if membersLoading}
-				<p class="text-[#8c7b73] text-sm py-4 text-center">Loading members...</p>
+				<p class="text-sm py-4 text-center" style="color: var(--todo-text-secondary);">
+					Loading members...
+				</p>
 			{:else}
 				<div class="flex flex-col gap-1">
 					{#each members as member (member.id)}
@@ -150,15 +189,28 @@
 							onclick={() => !alreadyShared && !isOwner && handleShare(member.user.username)}
 							disabled={sharing || alreadyShared || isOwner}
 							class="w-full flex items-center gap-3 px-3 py-2 rounded-lg
-							{isOwner ? 'bg-amber-50' : alreadyShared ? 'bg-green-50' : 'hover:bg-stone-50'}
 							cursor-pointer transition-colors text-left disabled:opacity-70 disabled:cursor-default"
+							style="background-color: {isOwner
+								? 'var(--todo-badge-owner-bg)'
+								: alreadyShared
+									? 'var(--todo-success-bg)'
+									: 'transparent'};"
+							onmouseenter={(e) => {
+								if (!isOwner && !alreadyShared)
+									e.currentTarget.style.backgroundColor = 'var(--todo-hover-bg)';
+							}}
+							onmouseleave={(e) => {
+								if (!isOwner && !alreadyShared)
+									e.currentTarget.style.backgroundColor = 'transparent';
+							}}
 						>
 							<div
-								class="w-8 h-8 rounded-full {isOwner
-									? 'bg-amber-500'
+								class="w-8 h-8 rounded-full text-white flex items-center justify-center text-sm font-medium"
+								style="background-color: {isOwner
+									? 'var(--todo-avatar-owner-bg)'
 									: alreadyShared
-										? 'bg-emerald-500'
-										: 'bg-[#e76e50]'} text-white flex items-center justify-center text-sm font-medium"
+										? 'var(--todo-avatar-access-bg)'
+										: 'var(--todo-avatar-accent-bg)'};"
 							>
 								{#if isOwner}
 									👑
@@ -169,23 +221,29 @@
 								{/if}
 							</div>
 							<div class="flex-1">
-								<div class="text-sm font-medium text-[#2c2421]">
+								<div class="text-sm font-medium" style="color: var(--todo-text-primary);">
 									{member.user.full_name || member.user.username}
 									{#if isOwner}
 										<span
-											class="ml-1.5 text-xs font-medium text-amber-600 bg-amber-100 px-1.5 py-0.5 rounded-full"
+											class="ml-1.5 text-xs font-medium px-1.5 py-0.5 rounded-full"
+											style="color: var(--todo-badge-owner-text); background-color: var(--todo-badge-owner-bg);"
 											>Owner</span
 										>
 									{/if}
 								</div>
-								<div class="text-xs text-[#8c7b73]">@{member.user.username}</div>
+								<div class="text-xs" style="color: var(--todo-text-secondary);">
+									@{member.user.username}
+								</div>
 								{#if member.user.email}
-									<div class="text-xs text-[#a89890]">{member.user.email}</div>
+									<div class="text-xs" style="color: var(--todo-text-muted);">
+										{member.user.email}
+									</div>
 								{/if}
 							</div>
 							{#if alreadyShared}
 								<span
-									class="text-xs font-medium text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded-full"
+									class="text-xs font-medium px-2 py-0.5 rounded-full"
+									style="color: var(--todo-badge-access-text); background-color: var(--todo-badge-access-bg);"
 								>
 									Has access
 								</span>
@@ -193,7 +251,9 @@
 						</button>
 					{/each}
 					{#if members.length === 0}
-						<p class="text-[#8c7b73] text-sm text-center py-4">No other members in this group</p>
+						<p class="text-sm text-center py-4" style="color: var(--todo-text-secondary);">
+							No other members in this group
+						</p>
 					{/if}
 				</div>
 			{/if}

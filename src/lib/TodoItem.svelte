@@ -77,11 +77,13 @@
 >
 	<!-- Circular checkbox -->
 	<div
-		class="flex-shrink-0 w-6 h-6 rounded-full border-2 flex items-center justify-center cursor-pointer transition-all {todo.done
-			? ''
-			: 'border-gray-300 hover:border-gray-400'} {toggling ? 'opacity-50' : ''}"
+		class="flex-shrink-0 w-6 h-6 rounded-full border-2 flex items-center justify-center cursor-pointer transition-all {toggling
+			? 'opacity-50'
+			: ''}"
 		style="
-		{todo.done ? `background-color: ${list.theme}; border-color: ${list.theme};` : ''}
+		{todo.done
+			? `background-color: ${list.theme}; border-color: ${list.theme};`
+			: `border-color: var(--todo-checkbox-border);`}
 	"
 		onclick={handleToggle}
 	>
@@ -94,14 +96,19 @@
 		contenteditable
 		bind:innerText={todo.text}
 		onblur={handleTextEdit}
-		class="flex-grow px-4 py-1
-	{todo.done ? 'line-through text-gray-400' : 'text-gray-800'}"
+		class="flex-grow px-4 py-1"
+		style="color: {todo.done ? 'var(--todo-text-muted)' : 'var(--todo-text-primary)'}; {todo.done
+			? 'text-decoration: line-through;'
+			: ''}"
 	/>
 
 	<button
 		onclick={handleDelete}
 		disabled={deleting}
-		class="cursor-pointer text-red-500 hover:text-red-700 font-bold transition-colors disabled:opacity-50"
+		class="cursor-pointer font-bold transition-colors disabled:opacity-50"
+		style="color: var(--todo-delete-color);"
+		onmouseenter={(e) => (e.currentTarget.style.color = 'var(--todo-delete-hover)')}
+		onmouseleave={(e) => (e.currentTarget.style.color = 'var(--todo-delete-color)')}
 	>
 		✕
 	</button>

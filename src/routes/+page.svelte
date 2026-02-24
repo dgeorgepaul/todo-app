@@ -20,6 +20,9 @@
 	});
 </script>
 
-<div class="min-h-screen flex items-center justify-center bg-[#fcfaf8]">
-	<div class="text-[#8c7b73]">Redirecting...</div>
+<div
+	class="min-h-screen flex items-center justify-center"
+	style="background-color: var(--todo-body-bg);"
+>
+	<div style="color: var(--todo-text-secondary);">Redirecting...</div>
 </div>
